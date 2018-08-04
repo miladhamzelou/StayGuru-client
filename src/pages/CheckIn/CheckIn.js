@@ -15,48 +15,71 @@ const FormItem = Form.Item;
 
 // Export this for unit testing more easily
 export class CheckIn extends Component {
-  componentDidMount() {}
+	componentDidMount() {}
 
-  render() {
-    const { getFieldDecorator } = this.props.form;
+	render() {
+		const { getFieldDecorator } = this.props.form;
 
-    return (
-      <div className={styles.Home}>
+		return(
+			<div className={styles.Home}>
         <Helmet title="Home" />
         <p>Check in</p>
         <Form
-          onSubmit={() => {
-   this.props.form.validateFields((err, values) => {
-     debugger;
-     if (!err) {
-
-     }
-   });
- }}
-
+          onSubmit={(e) => {
+            e.preventDefault();
+            this.props.form.validateFields((err, values) => {
+              if (!err) {
+                fetch('http://localhost:8080/check-in', {
+  method: 'POST',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(values)
+}).then((res) => {
+  debugger;
+}).catch((e) => {
+debugger;
+})
+              }
+            });
+          }}
         >
           <FormItem>
-            {getFieldDecorator('userName', {
+            {getFieldDecorator('confNumber', {
               rules: [
-                { required: true, message: 'Please input your username!' }
+                { required: true, message: 'Please input your confirmation #!' }
               ]
             })(
               <Input
                 prefix={
                   <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
                 }
-                placeholder="Username"
+                placeholder="Confirmation #"
+              />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('lastName', {
+              rules: [
+                { required: true, message: 'Please input your last Name!' }
+              ]
+            })(
+              <Input
+                prefix={
+                  <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
+                }
+                placeholder="Last Name"
               />
             )}
           </FormItem>
           <Button type="primary" htmlType="submit" className="login-form-button">
-                      Log in
-                    </Button>
-
+            Log in
+          </Button>
         </Form>
       </div>
-    );
-  }
+		);
+	}
 }
 
 const connector = connect();
@@ -64,6 +87,6 @@ const connector = connect();
 const CheckInForm = Form.create()(CheckIn);
 
 export default compose(
-  withRouter,
-  connector
+	withRouter,
+	connector
 )(CheckInForm);
